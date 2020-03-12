@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const request = require('request');
 
-function next(specialization,special,city,chunk,gorod,city_){
+function next(specialization,special,city,chunk,gorod,city_,spec_){
 	if(specialization.length==special){
 			return false;
 				console.log('Парсинг закончен!');
@@ -103,7 +103,7 @@ list_promise.then((gorod)=>{
 																next_id_++;
 																setTimeout(insert_info,5000,next_id_)
 															}else{
-																next(specialization,special,city,chunk,gorod,city_);
+																next(specialization,special,city,chunk,gorod,city_,spec_);
 															}
 												});
 
@@ -176,13 +176,13 @@ list_promise.then((gorod)=>{
 											if(jsod_decode.items.length > 0){	
 												insert_info(0); // считываем информацию
 											}else{
-												next(specialization,special,city,chunk,gorod,city_);
+												next(specialization,special,city,chunk,gorod,city_,spec_);
 											}
 										}
 							});
 					};
 	//chunk(44,0);
-	chunk(1624,0);		
+	chunk(5070,0);		
 
 	});
 });
