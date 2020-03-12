@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const request = require('request');
 
-function next(specialization,special,city,chunk,gorod){
+function next(specialization,special,city,chunk,gorod,city_){
 	if(specialization.length==special){
 			return false;
 				console.log('Парсинг закончен!');
@@ -15,7 +15,7 @@ function next(specialization,special,city,chunk,gorod){
 	}else{
 	city++;
 												
-	//fs.appendFile('city.txt',city_.name+"\n",(err)=>{});
+	fs.appendFile('city.txt',city_.name+"\n",(err)=>{});
 	setTimeout(chunk,6000,city,special);
 	}
 
@@ -97,13 +97,13 @@ list_promise.then((gorod)=>{
 																}
 																	
 
-
+																fs.appendFile('titly.txt',title_vakansy+"\n",(err)=>{});
 																	console.log(title_vakansy);
 
 																next_id_++;
 																setTimeout(insert_info,5000,next_id_)
 															}else{
-																next(specialization,special,city,chunk,gorod);
+																next(specialization,special,city,chunk,gorod,city_);
 															}
 												});
 
@@ -154,6 +154,8 @@ list_promise.then((gorod)=>{
 																append_id_info.push(el.id); //добавляем id
 															});
 																setTimeout(next_pagest,6000,pages); //смотрим следующую страницу
+															}else{
+																insert_info(0);
 															}
 														}else{
 																insert_info(0); // считываем информацию
@@ -174,13 +176,13 @@ list_promise.then((gorod)=>{
 											if(jsod_decode.items.length > 0){	
 												insert_info(0); // считываем информацию
 											}else{
-												next(specialization,special,city,chunk,gorod);
+												next(specialization,special,city,chunk,gorod,city_);
 											}
 										}
 							});
 					};
-	chunk(0,0);
-	
+	//chunk(44,0);
+	chunk(1624,0);		
 
 	});
 });
