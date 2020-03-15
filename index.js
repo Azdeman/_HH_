@@ -17,23 +17,30 @@ connection.query('SET SESSION wait_timeout=9999000');
 connection.query('SET CHARACTER SET utf8'); 
 
 
-
+function select_info(sql_post_m){
+	return new Promise((resolve,reject)=>{
+		connection.query(sql_post_m,(err,result)=>{
+			var json_i = JSON.parse(JSON.stringify(result));
+						resolve(json_i);
+				});
+			});
+}
 
 function next(specialization,special,city,chunk,gorod,city_,spec_){
 	if(specialization.length==special){
+		console.log('Парсинг закончен!');
 			return false;
-				console.log('Парсинг закончен!');
 	}else if(city == gorod.length-1){
 	special++;
 	city  = 0;
 												
 	fs.appendFile('spec.txt',spec_.name+"\n",(err)=>{});
-	setTimeout(chunk,6000,city,special);
+	setTimeout(chunk,4000,city,special);
 	}else{
 	city++;
 												
 	fs.appendFile('city.txt',city_.name+"\n",(err)=>{});
-	setTimeout(chunk,6000,city,special);
+	setTimeout(chunk,4000,city,special);
 	}
 
 }
@@ -94,7 +101,7 @@ list_promise.then((gorod)=>{
 						*/
 								var insert_info = ((next_id_)=>{
 										if(next_id_ < append_id_info.length){
-											
+											console.log(spec_.parent+' | '+spec_.name);
 													var next_id_  = next_id_;
 													var id_vakansy = append_id_info[next_id_];
 														id_vakansy = id_vakansy.id;
@@ -145,9 +152,11 @@ list_promise.then((gorod)=>{
 																	var quid = 'http://rabota-tut.site/vakansii/'+vakansy_info.title;
 																	var sql_insert = "INSERT INTO `vp_posts` VALUES('','1',NOW(),NOW(),'"+vakansy_info.description+"','"+vakansy_info.title+"','publish','','closed','closed','','"+vakansy_info.title+"','','','','','','','"+quid+"','','vakansii','','','"+city_.name+"')";
 																	var sql_post_meta = "INSERT INTO `vp_postmeta` (post_id, meta_key, meta_value) VALUES ?";
+																	var insertId__ = '';
 																	var add_insert_vp_post = (async(sql_insert)=>{
 																			return new Promise((resolve,reject)=>{
 																				connection.query(sql_insert,(err,result)=>{
+																					insertId__ = result.insertId;
 																					resolve(result.insertId);
 																				});
 																			});
@@ -171,13 +180,35 @@ list_promise.then((gorod)=>{
 
 																		return new Promise((resolve,reject)=>{
 																				connection.query(sql_post_meta,[insert_vp_postmeta],(err,result)=>{
-																					resolve(1);
+																					resolve(id_insert);
 																				});
 																			});
 																				
-																	}).then(()=>{
+																	}).then((insert_id)=>{
+
+																			var sql_post_m = "SELECT `term_taxonomy_id` FROM `vp_term_taxonomy` WHERE BINARY `description` = '"+spec_.parent+"'";
+																				return select_info(sql_post_m);
+
+
+																			
+																	}).then((parent_term_id)=>{
+																		var json_i = parent_term_id;
+																		var parent_id_term = json_i[0]['term_taxonomy_id'];
+																		var sql_post_m = "SELECT `term_taxonomy_id` FROM `vp_term_taxonomy` WHERE BINARY `description` = '"+spec_.name+"' AND `parent` = '"+parent_id_term+"'";
+																				return select_info(sql_post_m);	
+
+																	}).then((result)=>{
+																			var term_taxonomy_id__ = result[0]['term_taxonomy_id'];
+																			var sql_post_meta = "INSERT INTO `vp_term_relationships` VALUES ('"+insertId__+"','"+term_taxonomy_id__+"','0')";
+																				return new Promise((resolve,reject)=>{
+																					connection.query(sql_post_meta,(err,result)=>{
+																						resolve(result.insertId);
+																					});
+																				});
+																			
+																	}).then((in_id)=>{
 																			next_id_++;
-																			setTimeout(insert_info,5000,next_id_);
+																			setTimeout(insert_info,4000,next_id_);
 																	});
 
 																	// fs.appendFile('titly.txt',json_html.name+"\n",(err)=>{});
@@ -189,7 +220,7 @@ list_promise.then((gorod)=>{
 																}else{
 																	console.log(json_html.name + ' : Нет контактов!');
 																		next_id_++;
-																		setTimeout(insert_info,5000,next_id_);
+																		setTimeout(insert_info,4000,next_id_);
 																}
 
 																
@@ -248,7 +279,7 @@ list_promise.then((gorod)=>{
 															jsod_decode_next_page['items'].forEach(el=>{
 																append_id_info.push({'id':el.id,'require':(el.snippet!=null) ? el.snippet.requirement : null}); //добавляем id
 															});
-																setTimeout(next_pagest,6000,pages); //смотрим следующую страницу
+																setTimeout(next_pagest,4000,pages); //смотрим следующую страницу
 															}else{
 																insert_info(0);
 															}
@@ -276,9 +307,9 @@ list_promise.then((gorod)=>{
 										}
 							});
 					};
-	//chunk(44,0);
 	
-	chunk(1000,40);
+	
+	chunk(0,130);
 	
 	});
 });
