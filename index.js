@@ -25,7 +25,7 @@ function select_info(sql_post_m){
 }
 
 function next(specialization,special,city,chunk,gorod,city_,spec_){
-	if(specialization.length==special){
+	if(special==100){
 		console.log('Парсинг закончен!');
 			return false;
 	}else if(city == gorod.length-1){
@@ -82,7 +82,12 @@ list_promise.then((gorod)=>{
 							special = special,
 							specialize_category = spec_.parent; //категория
 
-							 
+							 fs.writeFileSync('current__.txt', city+'|'+special, (err) => {
+							 	console.log(err);
+								  if (err) throw err;
+								  	console.log('The file has been saved!');
+								  });
+
 								let request_url = `https://api.hh.ru/vacancies?specialization=${spec_.id}&area=${city_.id}&per_page=100`;
 						 			const options = {
 									  url: request_url,
@@ -147,8 +152,12 @@ list_promise.then((gorod)=>{
 																		'city'        : city_.name
 
 																	};
-																	var quid = 'http://rabota-tut.site/vakansii/'+vakansy_info.title;
-																	var sql_insert = "INSERT INTO `vp_posts` VALUES('','1',NOW(),NOW(),'"+vakansy_info.description+"','"+vakansy_info.title+"','','publish','closed','closed','','"+encodeURI(vakansy_info.title)+"','','','','','','','"+encodeURI(quid)+"','','vakansii','','','"+city_.name+"')";
+																	var vakansy_title = vakansy_info.title;
+																	var info_url 	  = vakansy_info.title.replace(/[\/\s*]/g,'-');
+																		info_url = info_url.replace(/[\(\,.:\=\#\@)\?\$\#\!\+\,\[\]\|\~]/g,'');
+																		
+																	var quid = 'http://rabota-tut.site/vakansii/'+info_url;
+																	var sql_insert = "INSERT INTO `vp_posts` VALUES('','1',NOW(),NOW(),'"+vakansy_info.description+"','"+vakansy_title+"','','publish','closed','closed','','"+encodeURI(vakansy_info.title)+"','','','','','','','"+encodeURI(quid)+"','','vakansii','','','"+city_.name+"')";
 																	var sql_post_meta = "INSERT INTO `vp_postmeta` (post_id, meta_key, meta_value) VALUES ?";
 																	var insertId__ = '';
 																	var add_insert_vp_post = (async(sql_insert)=>{
@@ -165,7 +174,7 @@ list_promise.then((gorod)=>{
 
 																	add_insert_vp_post(sql_insert).then((id_insert)=>{
 																			var insert_vp_postmeta = [];
-																			insert_vp_postmeta.push([id_insert,'vacancy',vakansy_info.title]);
+																			insert_vp_postmeta.push([id_insert,'vacancy',vakansy_title]);
 																			insert_vp_postmeta.push([id_insert,'salaryfrom',vakansy_info.salaryfrom]);
 																			insert_vp_postmeta.push([id_insert,'salaryto',vakansy_info.salaryto]);
 																			insert_vp_postmeta.push([id_insert,'experience',vakansy_info.experience]);
@@ -306,8 +315,14 @@ list_promise.then((gorod)=>{
 							});
 					};
 	
+	fs.readFile('current__.txt','utf8',(err,data)=>{
+		let exp = data.split('|');
+		let city__ = +exp[0]
+			special__ = +exp[1];
+
+		chunk(city__,special__);
+	});
 	
-	chunk(0,0);
 	
 	});
 });
