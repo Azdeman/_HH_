@@ -307,7 +307,7 @@ list_promise.then((gorod)=>{
 					};
 	
 	
-	chunk(0,40);
+	chunk(0,0);
 	
 	});
 });
