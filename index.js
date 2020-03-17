@@ -104,7 +104,7 @@ list_promise.then((gorod)=>{
 						*/
 								var insert_info = ((next_id_)=>{
 										if(next_id_ < append_id_info.length){
-											console.log(spec_.parent+' | '+spec_.name);
+											
 													var next_id_  = next_id_;
 													var id_vakansy = append_id_info[next_id_];
 														id_vakansy = id_vakansy.id;
