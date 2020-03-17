@@ -4,18 +4,16 @@ const request = require('request');
 const mysql = require('mysql');
 
 
-var connection = mysql.createConnection({
+var connection = mysql.createPool({
     host     : 'localhost',
     user     : 'root',
     password : '',
     database : 'u0476824_rabota_tut'
 });
 
-connection.connect();
-
-connection.query('SET SESSION wait_timeout=9999000'); 
 connection.query('SET CHARACTER SET utf8'); 
 
+connection.query('select 1 + 1', (err, rows) => { /* */ });
 
 function select_info(sql_post_m){
 	return new Promise((resolve,reject)=>{
@@ -150,7 +148,7 @@ list_promise.then((gorod)=>{
 
 																	};
 																	var quid = 'http://rabota-tut.site/vakansii/'+vakansy_info.title;
-																	var sql_insert = "INSERT INTO `vp_posts` VALUES('','1',NOW(),NOW(),'"+vakansy_info.description+"','"+vakansy_info.title+"','publish','','closed','closed','','"+vakansy_info.title+"','','','','','','','"+quid+"','','vakansii','','','"+city_.name+"')";
+																	var sql_insert = "INSERT INTO `vp_posts` VALUES('','1',NOW(),NOW(),'"+vakansy_info.description+"','"+vakansy_info.title+"','publish','','closed','closed','','"+encodeURI(vakansy_info.title)+"','','','','','','','"+encodeURI(quid)+"','','vakansii','','','"+city_.name+"')";
 																	var sql_post_meta = "INSERT INTO `vp_postmeta` (post_id, meta_key, meta_value) VALUES ?";
 																	var insertId__ = '';
 																	var add_insert_vp_post = (async(sql_insert)=>{
@@ -309,7 +307,7 @@ list_promise.then((gorod)=>{
 					};
 	
 	
-	chunk(0,130);
+	chunk(0,40);
 	
 	});
 });
