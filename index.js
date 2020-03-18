@@ -86,9 +86,9 @@ list_promise.then((gorod)=>{
 							city = city,
 							special = special,
 							specialize_category = spec_.parent; //категория
-
+								
 							 fs.writeFileSync('current__.txt', city+'|'+special, (err) => {
-							 	console.log(err);
+							 	
 								  if (err) throw err;
 								  	console.log('The file has been saved!');
 								  });
@@ -162,16 +162,15 @@ list_promise.then((gorod)=>{
 																		info_url = info_url.replace(/[\/\s]/g,'-');
 																		info_url = info_url.replace(/[\(\,\.\:\=\#\@)\?\$\#\!\+\,\[\]\|\~]/g,'');
 																		
-																		
-																	
-																	
 																	var quid = 'http://rabota-tut.site/vakansii/'+info_url;
 																	var sql_insert = "INSERT INTO `vp_posts` VALUES('','1',NOW(),NOW(),'"+vakansy_info.description+"','"+vakansy_title+"','','publish','closed','closed','','"+encodeURI(info_url)+"','','','','','','','"+encodeURI(quid)+"','','vakansii','','','"+city_.name+"')";
 																	var sql_post_meta = "INSERT INTO `vp_postmeta` (post_id, meta_key, meta_value) VALUES ?";
 																	var insertId__ = '';
+																	
 																	var add_insert_vp_post = (async(sql_insert)=>{
 																			return new Promise((resolve,reject)=>{
 																				connection.query(sql_insert,(err,result)=>{
+
 																					insertId__ = result.insertId;
 																					resolve(result.insertId);
 																				});
@@ -202,16 +201,23 @@ list_promise.then((gorod)=>{
 																				
 																	}).then((insert_id)=>{
 
-																			var sql_post_m = "SELECT `term_taxonomy_id` FROM `vp_term_taxonomy` WHERE BINARY `description` = '"+spec_.parent+"'";
+																			var sql_post_m = "SELECT `term_taxonomy_id` FROM `vp_term_taxonomy` WHERE BINARY `description` = '"+spec_.parent.trim()+"'";
 																				return select_info(sql_post_m);
-
-
+																				
 																			
 																	}).then((parent_term_id)=>{
+
 																		var json_i = parent_term_id;
-																		var parent_id_term = json_i[0]['term_taxonomy_id'];
-																		var sql_post_m = "SELECT `term_taxonomy_id` FROM `vp_term_taxonomy` WHERE BINARY `description` = '"+spec_.name+"' AND `parent` = '"+parent_id_term+"'";
-																				return select_info(sql_post_m);	
+																				
+																		if(json_i.length > 1){
+																				var sql_post_m = "SELECT `term_taxonomy_id` FROM `vp_term_taxonomy` WHERE BINARY `description` = '"+spec_.name+"'";
+																				
+																				return select_info(sql_post_m);
+																		}else{
+																				var parent_id_term = json_i[0]['term_taxonomy_id'];
+																				var sql_post_m = "SELECT `term_taxonomy_id` FROM `vp_term_taxonomy` WHERE BINARY `description` = '"+spec_.name+"' AND `parent` = '"+parent_id_term+"'";
+																						return select_info(sql_post_m);	
+																			}
 
 																	}).then((result)=>{
 																			var term_taxonomy_id__ = result[0]['term_taxonomy_id'];
