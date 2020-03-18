@@ -158,9 +158,13 @@ list_promise.then((gorod)=>{
 
 																	};
 																	var vakansy_title = vakansy_info.title;
-																	var info_url 	  = vakansy_info.title.replace(/[\/\s*]/g,'-');
+																	var info_url 	  = vakansy_info.title.replace(/\s\/\s/g,'-');
+																		info_url = info_url.replace(/[\/\s]/g,'-');
 																		info_url = info_url.replace(/[\(\,\.\:\=\#\@)\?\$\#\!\+\,\[\]\|\~]/g,'');
 																		
+																		
+																	
+																	
 																	var quid = 'http://rabota-tut.site/vakansii/'+info_url;
 																	var sql_insert = "INSERT INTO `vp_posts` VALUES('','1',NOW(),NOW(),'"+vakansy_info.description+"','"+vakansy_title+"','','publish','closed','closed','','"+encodeURI(info_url)+"','','','','','','','"+encodeURI(quid)+"','','vakansii','','','"+city_.name+"')";
 																	var sql_post_meta = "INSERT INTO `vp_postmeta` (post_id, meta_key, meta_value) VALUES ?";
