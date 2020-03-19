@@ -29,7 +29,7 @@ function select_info(sql_post_m){
 }
 
 function next(specialization,special,city,chunk,gorod,city_,spec_){
-	if(special==310){
+	if(special==124){
 		console.log('Парсинг закончен!');
 			return false;
 	}else if(city == gorod.length-1){
@@ -203,8 +203,13 @@ list_promise.then((gorod)=>{
 
 																	add_insert_vp_post(sql_insert).then((id_insert)=>{
 																			var insert_vp_postmeta = [];
-																			vakansy_info.address = getReplace_(vakansy_info.address);
-																			vakansy_info.company = getReplace_(vakansy_info.company);
+																			if(vakansy_info.address!=null){
+																				vakansy_info.address = getReplace_(vakansy_info.address);
+																			}
+
+																			if(vakansy_info.company!=null){ 
+																				vakansy_info.company = getReplace_(vakansy_info.company);
+																			}
 
 																			insert_vp_postmeta.push([id_insert,'vacancy',vakansy_title]);
 																			insert_vp_postmeta.push([id_insert,'salaryfrom',vakansy_info.salaryfrom]);
