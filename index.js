@@ -15,6 +15,10 @@ connection.query('SET CHARACTER SET utf8');
 
 connection.query('select 1 + 1', (err, rows) => { /* */ });
 
+function getReplace_(nt){
+	return nt.replace(/[\'\"\~\`]/,'');
+}
+
 function select_info(sql_post_m){
 	return new Promise((resolve,reject)=>{
 		connection.query(sql_post_m,(err,result)=>{
@@ -25,7 +29,7 @@ function select_info(sql_post_m){
 }
 
 function next(specialization,special,city,chunk,gorod,city_,spec_){
-	if(special==200){
+	if(special==62){
 		console.log('Парсинг закончен!');
 			return false;
 	}else if(city == gorod.length-1){
@@ -131,7 +135,7 @@ list_promise.then((gorod)=>{
 																		var phones = '';
 																		json_html.contacts.phones.forEach(el=>{
 																		    
-																		    phones = '+'+el['country']+'('+el['city']+')'+el['number'];
+																		    phones = '+'+el['country']+' ('+el['city']+') '+el['number'];
 																		  
 																		})
 																	}
@@ -158,19 +162,38 @@ list_promise.then((gorod)=>{
 
 																	};
 																	var vakansy_title = vakansy_info.title;
-																	var info_url 	  = vakansy_info.title.replace(/\s\/\s/g,'-');
+																	var info_url 	  = vakansy_info.title.replace(/(\s\/\s|\s[\(\)]\s)/g,'-');
 																		info_url = info_url.replace(/[\/\s]/g,'-');
-																		info_url = info_url.replace(/[\(\,\.\:\=\#\@)\?\$\#\!\+\,\[\]\|\~]/g,'');
+																		info_url = info_url.replace(/[\(\,\.\:\=\#\@)\?\$\#\!\+\,\[\]\|\~]/g,'').trim();
 																		
+																		vakansy_info.description = getReplace_(vakansy_info.description);
+																		vakansy_title = getReplace_(vakansy_title);
+																		info_url = getReplace_(info_url);
+																		
+
 																	var quid = 'http://rabota-tut.site/vakansii/'+info_url;
 																	var sql_insert = "INSERT INTO `vp_posts` VALUES('','1',NOW(),NOW(),'"+vakansy_info.description+"','"+vakansy_title+"','','publish','closed','closed','','"+encodeURI(info_url)+"','','','','','','','"+encodeURI(quid)+"','','vakansii','','','"+city_.name+"')";
 																	var sql_post_meta = "INSERT INTO `vp_postmeta` (post_id, meta_key, meta_value) VALUES ?";
 																	var insertId__ = '';
+																		
+
+																	var sql_select_post_metas = "SELECT `post_content` FROM `vp_posts` WHERE `post_content` = '"+vakansy_info.description+"' AND `post_title` = '"+vakansy_title+"'";
+
+
+																	var select_no_one = (async(sql_select_post_metas)=>{
+																				return select_info(sql_select_post_metas);
+																	});
+
+																	select_no_one(sql_select_post_metas).then((els)=>{
+
+																		if(els[0]==undefined || els[0].length == 0){
+
 																	
+
 																	var add_insert_vp_post = (async(sql_insert)=>{
 																			return new Promise((resolve,reject)=>{
 																				connection.query(sql_insert,(err,result)=>{
-
+																						
 																					insertId__ = result.insertId;
 																					resolve(result.insertId);
 																				});
@@ -178,10 +201,11 @@ list_promise.then((gorod)=>{
 																	});
 																	
 
-																				
-
 																	add_insert_vp_post(sql_insert).then((id_insert)=>{
 																			var insert_vp_postmeta = [];
+																			vakansy_info.address = getReplace_(vakansy_info.address);
+																			vakansy_info.company = getReplace_(vakansy_info.company);
+
 																			insert_vp_postmeta.push([id_insert,'vacancy',vakansy_title]);
 																			insert_vp_postmeta.push([id_insert,'salaryfrom',vakansy_info.salaryfrom]);
 																			insert_vp_postmeta.push([id_insert,'salaryto',vakansy_info.salaryto]);
@@ -231,8 +255,15 @@ list_promise.then((gorod)=>{
 																	}).then((in_id)=>{
 																			next_id_++;
 																			setTimeout(insert_info,4000,next_id_);
-																	});
+																	})
 
+																}else{
+																		console.log('Такое объявление уже существует!');
+																		next_id_++;
+																			setTimeout(insert_info,4000,next_id_);
+																}
+
+																});
 																	// fs.appendFile('titly.txt',json_html.name+"\n",(err)=>{});
 																	console.log(vakansy_info);
 																	
