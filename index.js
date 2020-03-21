@@ -16,7 +16,7 @@ connection.query('SET CHARACTER SET utf8');
 connection.query('select 1 + 1', (err, rows) => { /* */ });
 
 function getReplace_(nt){
-	return nt.replace(/[\'\"\~\`]/,'');
+	return nt.replace(/[\'\"\~\`]/g,'');
 }
 
 function select_info(sql_post_m){
