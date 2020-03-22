@@ -15,6 +15,37 @@ connection.query('SET CHARACTER SET utf8');
 
 connection.query('select 1 + 1', (err, rows) => { /* */ });
 
+function Redit_shablon(n){
+	let rus_alfavit = {
+					'а':'a', 'б':'b', 'в':'v', 'г':'g', 'д':'d',
+					'е':'e', 'ё':'yo', 'ж':'j', 'з':'z', 'и':'i', 'й':'i',
+					'к':'k', 'л':'l', 'м':'m', 'н':'n', 'о':'o', 'п':'p',
+					'р':'r', 'с':'s', 'т':'t', 'у':'u', 'ф':'f', 'х':'h',
+					'ц':'c', 'ч':'ch', 'ш':'sh', 'щ':'sh', 'ы':'i', 'э':'e',
+					'ю':'u', 'я':'ya', 'А':'A', 'Б':'B', 'В':'V', 'Г':'G',
+					'Д':'D', 'Е':'E', 'Ё':'Yo', 'Ж':'J', 'З':'Z', 'И':'I',
+					'Й':'I', 'К':'K', 'Л':'L', 'М':'M', 'Н':'N', 'О':'O',
+					'П':'P', 'Р':'R', 'С':'S', 'Т':'T', 'У':'U', 'Ф':'F',
+					'Х':'H', 'Ц':'C', 'Ч':'Ch', 'Ш':'Sh', 'Щ':'Sh', 'Ы':'I',
+					'Э':'E', 'Ю':'U', 'Я':'Ya', 'ь':'', 'Ь':'', 'ъ':'',
+					'Ъ':''
+				};
+
+	var shablon = n;
+	shablon = shablon.toLowerCase();
+	var str = '';
+	for(var i=0;i<shablon.length;i++){
+	    if(!rus_alfavit.hasOwnProperty(shablon[i])){
+	        str+='-';
+	    }else{
+	        str+=rus_alfavit[shablon[i]];
+	    }
+	}
+    		return str+='-vakansia'
+}
+
+
+
 function getReplace_(nt){
 	return nt.replace(/[\'\"\~\`]/g,'');
 }
@@ -22,6 +53,7 @@ function getReplace_(nt){
 function select_info(sql_post_m){
 	return new Promise((resolve,reject)=>{
 		connection.query(sql_post_m,(err,result)=>{
+			
 			var json_i = JSON.parse(JSON.stringify(result));
 						resolve(json_i);
 				});
@@ -170,6 +202,11 @@ list_promise.then((gorod)=>{
 																		vakansy_title = getReplace_(vakansy_title);
 																		info_url = getReplace_(info_url);
 																		
+																		fs.writeFileSync('ssss.txt', vakansy_title , (err) => {
+																	 	
+																		  if (err) throw err;
+																		  	console.log('The file has been saved!');
+																		  });
 
 																	var quid = 'http://rabota-tut.site/vakansii/'+info_url;
 																	var sql_insert = "INSERT INTO `vp_posts` VALUES('','1',NOW(),NOW(),'"+vakansy_info.description+"','"+vakansy_title+"','','publish','closed','closed','','"+encodeURI(info_url)+"','','','','','','','"+encodeURI(quid)+"','','vakansii','','','"+city_.name+"')";
@@ -181,6 +218,7 @@ list_promise.then((gorod)=>{
 
 
 																	var select_no_one = (async(sql_select_post_metas)=>{
+																		
 																				return select_info(sql_select_post_metas);
 																	});
 
@@ -200,6 +238,7 @@ list_promise.then((gorod)=>{
 																			});
 																	});
 																	
+																	
 
 																	add_insert_vp_post(sql_insert).then((id_insert)=>{
 																			var insert_vp_postmeta = [];
@@ -215,11 +254,11 @@ list_promise.then((gorod)=>{
 																			insert_vp_postmeta.push([id_insert,'salaryfrom',vakansy_info.salaryfrom]);
 																			insert_vp_postmeta.push([id_insert,'salaryto',vakansy_info.salaryto]);
 																			insert_vp_postmeta.push([id_insert,'experience',vakansy_info.experience]);
-																			insert_vp_postmeta.push([id_insert,'address',vakansy_info.address]);
+																			insert_vp_postmeta.push([id_insert,'address',getReplace_(vakansy_info.address)]);
 																			insert_vp_postmeta.push([id_insert,'email',vakansy_info.email]);
-																			insert_vp_postmeta.push([id_insert,'company',vakansy_info.company]);
+																			insert_vp_postmeta.push([id_insert,'company',getReplace_(vakansy_info.company)]);
 																			insert_vp_postmeta.push([id_insert,'source_site',vakansy_info.source_site]);	
-																			insert_vp_postmeta.push([id_insert,'contacter',vakansy_info.contacter]);
+																			insert_vp_postmeta.push([id_insert,'contacter',getReplace_(vakansy_info.contacter)]);
 																			insert_vp_postmeta.push([id_insert,'phone',vakansy_info.phones]);
 
 																		return new Promise((resolve,reject)=>{
@@ -228,28 +267,111 @@ list_promise.then((gorod)=>{
 																				});
 																			});
 																				
-																	}).then((insert_id)=>{
+																	}).then(async (insert_id)=>{
 
-																			var sql_post_m = "SELECT `term_taxonomy_id` FROM `vp_term_taxonomy` WHERE BINARY `description` = '"+spec_.parent.trim()+"'";
-																				return select_info(sql_post_m);
+																			var sql_post_m = "SELECT `term_taxonomy_id` FROM `vp_term_taxonomy` WHERE BINARY `description` = '"+spec_.parent+"'";
+																			var sel_info =  await select_info(sql_post_m);
+																					if(sel_info==0){
+																						var slug = Redit_shablon(spec_.parent);
+																						var insert_sel = "INSERT INTO `vp_terms` VALUES ('','"+spec_.parent+"','"+slug+"','0')";
+
+																						var add_vp_terms = ((insert_sel)=>{
+																							return new Promise((resolve,reject)=>{
+																									connection.query(insert_sel,(err,result)=>{
+																										resolve(result.insertId);
+																									});
+																								});
+																						 });
+
+																						var add_new_category = await add_vp_terms(insert_sel);
+
+																						var term_taxonomy_id = "INSERT INTO `vp_term_taxonomy` VALUES ('','"+add_new_category+"','category','"+spec_.parent+"','0','0')";
+
+																							return new Promise((resolve,reject)=>{
+																									connection.query(term_taxonomy_id,(err,result)=>{
+																										resolve([{"term_taxonomy_id":result.insertId}]);
+																									});
+																							});
+
+
+																					}else{
+																						return sel_info;
+																					}
 																				
 																			
-																	}).then((parent_term_id)=>{
-
+																	}).then(async (parent_term_id)=>{
 																		var json_i = parent_term_id;
-																				
+																		spec_.name = getReplace_(spec_.name);
+																		
 																		if(json_i.length > 1){
 																				var sql_post_m = "SELECT `term_taxonomy_id` FROM `vp_term_taxonomy` WHERE BINARY `description` = '"+spec_.name+"'";
 																				
-																				return select_info(sql_post_m);
+																				var sel_info = await select_info(sql_post_m);
+																					if(sel_info.length==0){
+																						
+																						slug = Redit_shablon(spec_.name);
+																						var insert_sel = "INSERT INTO `vp_terms` VALUES ('','"+spec_.name+"','"+slug+"','0')";
+
+																						var add_vp_terms = ((insert_sel)=>{
+																							return new Promise((resolve,reject)=>{
+																									connection.query(insert_sel,(err,result)=>{
+																										resolve(result.insertId);
+																									});
+																								});
+																						 });
+
+																						
+
+																							var term_taxonomy_id__ = "INSERT INTO `vp_posts` VALUES ('','"+max_id+"','category','"+spec_.name+"','"+json_i[0]['term_taxonomy_id']+"','0')";
+																								return new Promise((resolve,reject)=>{
+																									connection.query(term_taxonomy_id__,(err,result)=>{
+																										var term_taxonomy_id__ = [];
+																										term_taxonomy_id__.push({"term_taxonomy_id":result.insertId});
+																											resolve(term_taxonomy_id__);
+																									});
+																								});
+
+																					}else{
+																						return sel_info;	
+																					}
 																		}else{
 																				var parent_id_term = json_i[0]['term_taxonomy_id'];
 																				var sql_post_m = "SELECT `term_taxonomy_id` FROM `vp_term_taxonomy` WHERE BINARY `description` = '"+spec_.name+"' AND `parent` = '"+parent_id_term+"'";
-																						return select_info(sql_post_m);	
+																						var sel_info = await select_info(sql_post_m);
+																					if(sel_info.length==0){
+																						
+																						slug = Redit_shablon(spec_.name);
+																						var insert_sel = "INSERT INTO `vp_terms` VALUES ('','"+spec_.name+"','"+slug+"','0')";
+
+																						var add_vp_terms = ((insert_sel)=>{
+																							return new Promise((resolve,reject)=>{
+																									connection.query(insert_sel,(err,result)=>{
+																										resolve(result.insertId);
+																									});
+																								});
+																						 });
+
+																						var insert_id_vp_terms = await add_vp_terms(insert_sel);
+
+																							var term_taxonomy_id__ = "INSERT INTO `vp_term_taxonomy` VALUES ('','"+insert_id_vp_terms+"','category','"+spec_.name+"','"+parent_id_term+"','0')";
+																								
+																								return new Promise((resolve,reject)=>{
+																									connection.query(term_taxonomy_id__,(err,result)=>{
+																										var term_taxonomy_id__ = [];
+																										term_taxonomy_id__.push({"term_taxonomy_id":result.insertId});
+																										
+																											resolve(term_taxonomy_id__);
+																									});
+																								});
+
+																					}else{
+																						return sel_info;	
+																					}	
 																			}
 
-																	}).then((result)=>{
+																	}).then(async (result)=>{
 																			var term_taxonomy_id__ = result[0]['term_taxonomy_id'];
+
 																			var sql_post_meta = "INSERT INTO `vp_term_relationships` VALUES ('"+insertId__+"','"+term_taxonomy_id__+"','0')";
 																				return new Promise((resolve,reject)=>{
 																					connection.query(sql_post_meta,(err,result)=>{
