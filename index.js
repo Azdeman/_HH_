@@ -254,11 +254,11 @@ list_promise.then((gorod)=>{
 																			insert_vp_postmeta.push([id_insert,'salaryfrom',vakansy_info.salaryfrom]);
 																			insert_vp_postmeta.push([id_insert,'salaryto',vakansy_info.salaryto]);
 																			insert_vp_postmeta.push([id_insert,'experience',vakansy_info.experience]);
-																			insert_vp_postmeta.push([id_insert,'address',getReplace_(vakansy_info.address)]);
+																			insert_vp_postmeta.push([id_insert,'address',vakansy_info.address]);
 																			insert_vp_postmeta.push([id_insert,'email',vakansy_info.email]);
-																			insert_vp_postmeta.push([id_insert,'company',getReplace_(vakansy_info.company)]);
+																			insert_vp_postmeta.push([id_insert,'company',vakansy_info.company]);
 																			insert_vp_postmeta.push([id_insert,'source_site',vakansy_info.source_site]);	
-																			insert_vp_postmeta.push([id_insert,'contacter',getReplace_(vakansy_info.contacter)]);
+																			insert_vp_postmeta.push([id_insert,'contacter',vakansy_info.contacter]);
 																			insert_vp_postmeta.push([id_insert,'phone',vakansy_info.phones]);
 
 																		return new Promise((resolve,reject)=>{
