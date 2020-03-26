@@ -61,7 +61,7 @@ function select_info(sql_post_m){
 }
 
 function next(specialization,special,city,chunk,gorod,city_,spec_){
-	if(special==248){
+	if(special==310){
 		console.log('Парсинг закончен!');
 			return false;
 	}else if(city == gorod.length-1){
@@ -213,17 +213,17 @@ list_promise.then((gorod)=>{
 																	var sql_post_meta = "INSERT INTO `vp_postmeta` (post_id, meta_key, meta_value) VALUES ?";
 																	var insertId__ = '';
 																		
-
+																		
 																	var sql_select_post_metas = "SELECT `post_content` FROM `vp_posts` WHERE `post_content` = '"+vakansy_info.description+"' AND `post_title` = '"+vakansy_title+"'";
 
 
 																	var select_no_one = (async(sql_select_post_metas)=>{
-																		
-																				return select_info(sql_select_post_metas);
+																		return select_info(sql_select_post_metas);
+																			
 																	});
 
 																	select_no_one(sql_select_post_metas).then((els)=>{
-
+																		
 																		if(els[0]==undefined || els[0].length == 0){
 
 																	
