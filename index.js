@@ -320,9 +320,9 @@ list_promise.then((gorod)=>{
 																								});
 																						 });
 
-																						
+																							var insert_id_vp_terms = await add_vp_terms(insert_sel);
 
-																							var term_taxonomy_id__ = "INSERT INTO `vp_posts` VALUES ('','"+max_id+"','category','"+spec_.name+"','"+json_i[0]['term_taxonomy_id']+"','0')";
+																							var term_taxonomy_id__ = "INSERT INTO `vp_term_taxonomy` VALUES ('','"+insert_id_vp_terms+"','category','"+spec_.name+"','"+json_i[0]['term_taxonomy_id']+"','0')";
 																								return new Promise((resolve,reject)=>{
 																									connection.query(term_taxonomy_id__,(err,result)=>{
 																										var term_taxonomy_id__ = [];
