@@ -6,9 +6,9 @@ const mysql = require('mysql');
 
 var connection = mysql.createPool({
     host     : '31.31.196.162',
-    user     : 'xxx',
-    password : 'xxx,
-    database : 'xxx'
+    user     : 'u0476824_default',
+    password : '6-ZP#g#0S7Nad26v%,
+    database : 'u0476824_rabota_tut'
 });
 
 connection.query('SET CHARACTER SET utf8'); 
@@ -61,7 +61,7 @@ function select_info(sql_post_m){
 }
 
 function next(specialization,special,city,chunk,gorod,city_,spec_){
-	if(special==310){
+	if(special==62){
 		console.log('Парсинг закончен!');
 			return false;
 	}else if(city == gorod.length-1){
@@ -200,13 +200,17 @@ list_promise.then((gorod)=>{
 																		
 																		vakansy_info.description = getReplace_(vakansy_info.description);
 																		vakansy_title = getReplace_(vakansy_title);
+																		let randstr = 'i'+Math.random().toString(36).substring(2);
 																		info_url = getReplace_(info_url);
+																		info_url = info_url.replace(/\s*(\(|\/|\||-{2,10}).+/,'');
 																		
-																		fs.writeFileSync('ssss.txt', vakansy_title , (err) => {
-																	 	
-																		  if (err) throw err;
-																		  	console.log('The file has been saved!');
-																		  });
+																		var s = info_url.split('-');
+																		var l1 = s[0] || '',
+																			l2 = s[1] || '',
+																			l3 = s[2] || '';
+																		info_url = l1+'-'+l2+'-'+l3;
+																		info_url = info_url.replace(/\-{1,3}$/,'')+'-'+randstr;
+																	
 
 																	var quid = 'http://rabota-tut.site/vakansii/'+info_url;
 																	var sql_insert = "INSERT INTO `vp_posts` VALUES('','1',NOW(),NOW(),'"+vakansy_info.description+"','"+vakansy_title+"','','publish','closed','closed','','"+encodeURI(info_url)+"','','','','','','','"+encodeURI(quid)+"','','vakansii','','','"+city_.name+"')";
@@ -494,6 +498,7 @@ list_promise.then((gorod)=>{
 			special__ = +exp[1];
 
 		chunk(city__,special__);
+		
 	});
 	
 	
