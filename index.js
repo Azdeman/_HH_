@@ -6,9 +6,9 @@ const mysql = require('mysql');
 
 var connection = mysql.createPool({
     host     : '31.31.196.162',
-    user     : 'xxx',
-    password : 'xxx',
-    database : 'xxx'
+    user     : 'u0476824_default',
+    password : '6-ZP#g#0S7Nad26v%',
+    database : 'u0476824_rabota_tut'
 });
 
 connection.query('SET CHARACTER SET utf8'); 
@@ -61,7 +61,7 @@ function select_info(sql_post_m){
 }
 
 function next(specialization,special,city,chunk,gorod,city_,spec_){
-	if(special==496){
+	if(special==558){
 		console.log('Парсинг закончен!');
 			return false;
 	}else if(city == gorod.length-1){
