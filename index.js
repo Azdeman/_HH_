@@ -61,7 +61,7 @@ function select_info(sql_post_m){
 }
 
 function next(specialization,special,city,chunk,gorod,city_,spec_){
-	if(special==620){
+	if(special==672){
 		console.log('Парсинг закончен!');
 			return false;
 	}else if(city == gorod.length-1){
